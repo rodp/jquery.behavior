@@ -12,41 +12,39 @@
 /*global jQuery */
 /*members apply, behavior, each, fn, get */
 "use strict";
-(function ($) {
-    $.fn.behavior = function (action, args) {
-        var element = $(this),
-            type    = typeof action;
-        
-        function attach(Name, config) {
-            return element.each(function () {
-                this.behavior = new Name(this, config);
-            });
-        }
-        
-        function get(index) {
-            return element.get(index || 0).behavior;
-        }
-        
-        function map(method, attributes) {
-            return element.each(function () {
-                var obj = this.behavior;
-                if (method in obj) {
-                    if (typeof obj[method] === "function") {
-                        obj[method].apply(obj, attributes);
-                    } else {
-                        obj[method] = attributes;
-                    }
+jQuery.fn.behavior = function (action, args) {
+    var element = this,
+        type    = typeof action;
+    
+    function attach(Name, config) {
+        return element.each(function () {
+            this.behavior = new Name(this, config);
+        });
+    }
+    
+    function get(index) {
+        return element.get(index || 0).behavior;
+    }
+    
+    function map(method, attributes) {
+        return element.each(function () {
+            var obj = this.behavior;
+            if (method in obj) {
+                if (typeof obj[method] === "function") {
+                    obj[method].apply(obj, attributes);
+                } else {
+                    obj[method] = attributes;
                 }
-            });
-        }
-        
-        if (type === "function") {
-            return attach(action, args || {});
-        } else if (action === "string") {
-            return map(action, args || []);
-        } else if (action === "number") {
-            return get(action);
-        }
-        return get();
-    };
-}(jQuery));
+            }
+        });
+    }
+    
+    if (type === "function") {
+        return attach(action, args || {});
+    } else if (action === "string") {
+        return map(action, args || []);
+    } else if (action === "number") {
+        return get(action);
+    }
+    return get();
+};
