@@ -8,45 +8,45 @@
  *
  * Date: 2009-12-13
  */
+/*jslint white: true, onevar: true, undef: true, nomen: true, eqeqeq: true, plusplus: true, bitwise: true, regexp: true, strict: true, newcap: true, immed: true */
+/*global jQuery */
+/*members apply, behavior, each, fn, get */
+"use strict";
 (function ($) {
-    $.fn.behavior = function () {
-      var element = this;
-      
-      var attach = function (cls, config) {
-        $(element).each(function () {
-          this.behavior = new cls(this, config);
-        });
+    $.fn.behavior = function (action, args) {
+        var element = $(this),
+            type    = typeof action;
         
-        return $(element);
-      }
-      
-      var get = function (index) {
-        return $(element).get(index || 0).behavior;
-      }
-      
-      var map = function (method, attributes) {
-        $(element).each(function () {
-          var obj = this.behavior;
-          if (method in obj) {
-            if (typeof obj[method] == 'function') {
-              obj[method].apply(obj, attributes);
-            } else {
-              obj[method] = attributes;
-            }
-          }
-        });
+        function attach(Name, config) {
+            return element.each(function () {
+                this.behavior = new Name(this, config);
+            });
+        }
         
-        return $(element);
-      }
-   
-      if (arguments.length > 0 && typeof arguments[0] == 'function') {
-        return attach(arguments[0], arguments.length > 1 ? arguments[1] : {});
-      } else if (arguments.length > 0 && typeof arguments[0] == 'string') {
-        return map(arguments[0], arguments.length > 1 ? arguments[1] : []);
-      } else if (arguments.length > 0 && typeof arguments[0] == 'number') {
-        return get(arguments[0]);
-      } else {
+        function get(index) {
+            return element.get(index || 0).behavior;
+        }
+        
+        function map(method, attributes) {
+            return element.each(function () {
+                var obj = this.behavior;
+                if (method in obj) {
+                    if (typeof obj[method] === "function") {
+                        obj[method].apply(obj, attributes);
+                    } else {
+                        obj[method] = attributes;
+                    }
+                }
+            });
+        }
+        
+        if (type === "function") {
+            return attach(action, args || {});
+        } else if (action === "string") {
+            return map(action, args || []);
+        } else if (action === "number") {
+            return get(action);
+        }
         return get();
-      }
-    }
-})(jQuery);
+    };
+}(jQuery));
