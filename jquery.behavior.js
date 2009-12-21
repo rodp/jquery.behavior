@@ -41,9 +41,9 @@ jQuery.fn.behavior = function (action, args) {
     
     if (type === "function") {
         return attach(action, args || {});
-    } else if (action === "string") {
+    } else if (type === "string") {
         return map(action, args || []);
-    } else if (action === "number") {
+    } else if (type === "number") {
         return get(action);
     }
     return get();
