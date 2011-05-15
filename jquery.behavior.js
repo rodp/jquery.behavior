@@ -1,50 +1,57 @@
- /*
- * jquery.behavior JavaScript Library v0.1
+/*
+ * jquery.behavior JavaScript Library v2.0
  * http://rodpetrovic.com/jquery/behavior
  *
- * Copyright (c) 2009 Rodoljub Petrović
+ * Copyright 2010, Rodoljub Petrović
  * Licensed under the MIT
  * http://www.opensource.org/licenses/mit-license.php
+ * 
+ * Contributors:
+ *  - Matjaž Lipuš
  *
- * Date: 2009-12-13
+ * Date: 2011-05-15
  */
-/*jslint white: true, onevar: true, undef: true, nomen: true, eqeqeq: true, plusplus: true, bitwise: true, regexp: true, strict: true, newcap: true, immed: true */
+/*jslint white: true, onevar: true, undef: true, nomen: true, regexp: true, plusplus: true, bitwise: true, newcap: true, strict: true, maxerr: 50, indent: 4 */
 /*global jQuery */
-/*members apply, behavior, each, fn, get */
-"use strict";
-jQuery.fn.behavior = function (action, args) {
-    var element = this,
-        type    = typeof action;
+(function ($, undef) {
+    "use strict";
     
-    function attach(Name, config) {
-        return element.each(function () {
-            this.behavior = new Name(this, config);
+    function attach($jq, Behavior, config) {
+        $jq.each(function () {
+            if (!this.behavior) {
+                this.behavior = {};
+            }
+            $.extend(this.behavior, new Behavior(this, config));
         });
     }
     
-    function get(index) {
-        return element.get(index || 0).behavior;
-    }
-    
-    function map(method, attributes) {
-        return element.each(function () {
-            var obj = this.behavior;
-            if (method in obj) {
-                if (typeof obj[method] === "function") {
-                    obj[method].apply(obj, attributes);
+    function each($jq, property, attributes) {
+        $jq.each(function () {
+            var behavior = this.behavior;
+            if (behavior && behavior[property] !== undef) {
+                if (typeof behavior[property] === "function") {
+                    behavior[property].apply(behavior, attributes || []);
                 } else {
-                    obj[method] = attributes;
+                    behavior[property] = attributes;
                 }
             }
         });
     }
     
-    if (type === "function") {
-        return attach(action, args || {});
-    } else if (type === "string") {
-        return map(action, args || []);
-    } else if (type === "number") {
-        return get(action);
+    function get($jq, index) {
+        return $jq.get(index || 0).behavior;
     }
-    return get();
-};
+    
+    $.fn.behavior = function (a, b) {
+        var type = typeof a;
+
+        if (type === "function") {
+            attach(this, a, b || {});
+            return this;
+        } else if (type === "string") {
+            each(this, a, b);
+            return this;
+        }
+        return get(this, a);
+    };
+}(jQuery));
