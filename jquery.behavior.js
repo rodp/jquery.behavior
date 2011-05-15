@@ -38,20 +38,17 @@
         });
     }
     
-    function get($jq, index) {
-        return $jq.get(index || 0).behavior;
-    }
-    
     $.fn.behavior = function (a, b) {
         var type = typeof a;
 
         if (type === "function") {
             attach(this, a, b || {});
             return this;
-        } else if (type === "string") {
+        }
+        if (type === "string") {
             each(this, a, b);
             return this;
         }
-        return get(this, a);
+        return this.get(a || 0).behavior;
     };
 }(jQuery));
