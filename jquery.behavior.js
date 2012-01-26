@@ -1,52 +1,54 @@
- /*
- * jquery.behavior JavaScript Library v0.1
+/*
+ * jquery.behavior JavaScript Library v2.0
  * http://rodpetrovic.com/jquery/behavior
  *
- * Copyright (c) 2009 Rodoljub Petrović
+ * Copyright 2010, Rodoljub Petrović
  * Licensed under the MIT
  * http://www.opensource.org/licenses/mit-license.php
+ * 
+ * Contributors:
+ *  - Matjaž Lipuš
  *
- * Date: 2009-12-13
+ * Date: 2011-05-15
  */
-(function ($) {
-    $.fn.behavior = function () {
-      var element = this;
-      
-      var attach = function (cls, config) {
-        $(element).each(function () {
-          this.behavior = new cls(this, config);
-        });
-        
-        return $(element);
-      }
-      
-      var get = function (index) {
-        return $(element).get(index || 0).behavior;
-      }
-      
-      var map = function (method, attributes) {
-        $(element).each(function () {
-          var obj = this.behavior;
-          if (method in obj) {
-            if (typeof obj[method] == 'function') {
-              obj[method].apply(obj, attributes);
-            } else {
-              obj[method] = attributes;
+/*jslint white: true, onevar: true, undef: true, nomen: true, regexp: true, plusplus: true, bitwise: true, newcap: true, strict: true, maxerr: 50, indent: 4 */
+/*global jQuery */
+(function ($, undef) {
+    "use strict";
+    
+    function attach($jq, Behavior, config) {
+        $jq.each(function () {
+            if (!this.behavior) {
+                this.behavior = {};
             }
-          }
+            $.extend(this.behavior, new Behavior(this, config));
         });
-        
-        return $(element);
-      }
-   
-      if (arguments.length > 0 && typeof arguments[0] == 'function') {
-        return attach(arguments[0], arguments.length > 1 ? arguments[1] : {});
-      } else if (arguments.length > 0 && typeof arguments[0] == 'string') {
-        return map(arguments[0], arguments.length > 1 ? arguments[1] : []);
-      } else if (arguments.length > 0 && typeof arguments[0] == 'number') {
-        return get(arguments[0]);
-      } else {
-        return get();
-      }
     }
-})(jQuery);
+    
+    function each($jq, property, attributes) {
+        $jq.each(function () {
+            var behavior = this.behavior;
+            if (behavior && behavior[property] !== undef) {
+                if (typeof behavior[property] === "function") {
+                    behavior[property].apply(behavior, attributes || []);
+                } else {
+                    behavior[property] = attributes;
+                }
+            }
+        });
+    }
+    
+    $.fn.behavior = function (a, b) {
+        var type = typeof a;
+
+        if (type === "function") {
+            attach(this, a, b || {});
+            return this;
+        }
+        if (type === "string") {
+            each(this, a, b);
+            return this;
+        }
+        return this.get(a || 0).behavior;
+    };
+}(jQuery));
